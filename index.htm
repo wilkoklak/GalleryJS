@@ -2,16 +2,16 @@
 <html lang="pl">
 <head>
 	<meta charset="utf-8">
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="gallery.css">
 </head>
 <body>
 <div class="container">
 </div>
 </body>
-<script src="index.js"></script>
+<script src="gallery.js"></script>
 <script>
 var pics = [];
 pics.push(new Picture("https://i.imgur.com/dvkiaQP.jpg", "Przykład 1", "Opis przykładu 1"));
 pics.push(new Picture("https://i.imgur.com/0V4gUeN.jpg", "Przykład 2", "Opis przykładu 2"));
-var gallery = new Gallery(document.querySelector(".container"), pics, 300, 128);
+var gallery = new Gallery(document.querySelector(".container"), pics, 500, 128, 300, "#000");
 </script>
