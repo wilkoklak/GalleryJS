@@ -2,6 +2,7 @@
 <html lang="pl">
 <head>
 	<meta charset="utf-8">
+	<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="container">
@@ -10,8 +11,7 @@
 <script src="index.js"></script>
 <script>
 var pics = [];
-pics.push(new Picture("pic.jpg", "tytuł", "opis"));
-pics.push(new Picture("pic2.jpg", "tytuł", "opis"));
-var gallery = new Gallery(document.querySelector(".container"), pics);
-console.log(gallery);
+pics.push(new Picture("https://i.imgur.com/dvkiaQP.jpg", "Przykład 1", "Opis przykładu 1"));
+pics.push(new Picture("https://i.imgur.com/0V4gUeN.jpg", "Przykład 2", "Opis przykładu 2"));
+var gallery = new Gallery(document.querySelector(".container"), pics, 300, 128);
 </script>
