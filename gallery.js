@@ -62,17 +62,32 @@ var GalleryJS = {
 			console.warn('List height must be a number! Set it to default for you.');
 			this.list_height = DEFAULTS.list_height;
 		}
+		this.loadPictures = () => {
+			var list = document.querySelector('.galleryjs-list');
+			while(list.firstChild) {
+				list.removeChild(list.firstChild);
+			}
+			for(i = 0; i < this.pictures.length; i++) {
+				let pic = createNode('div', 'galleryjs-thumbnail');
+				pic.style.backgroundImage = `url('${this.pictures[i].thumbnail}')`;
+				list.appendChild(pic);
+			}
+		}
 		this.addPicture = function(pic) {
 			if(pic.galleryJSStamp) {
-				this.pictures.push(pic)
+				this.pictures.push(pic);
+				this.loadPictures();
 			} else {
 				console.error('Image must be of Picture() class!');
 				return false;
 			}
 		}
 		this.preview = createNode('div', 'galleryjs-preview');
-		preview.style.height = this.preview_height + "px";
+		this.list = createNode('div', 'galleryjs-list');
+		this.preview.style.height = this.preview_height + "px";
 		this.container.appendChild(this.preview);
+		this.container.appendChild(this.list);
+		this.loadPictures();
 	},
 	Picture: function(url, thumbnail, title, description) {
 		if(url && url.trim() != '') {
@@ -106,6 +121,7 @@ var GalleryJS = {
 }
 // TESTING
 var x = GalleryJS;
-var test = new x.Picture('aaa');
-var gal = new GalleryJS.Gallery(document.querySelector('#container'), [], 'aaa', 'ooo');
-gal.addPicture('aa');
+var pics = [
+	new x.Picture('http://i.imgur.com/Jf77TsR.jpg')
+]
+var gal = new GalleryJS.Gallery(document.querySelector('#container'), pics);
