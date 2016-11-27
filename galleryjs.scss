@@ -10,4 +10,19 @@
 		margin: auto;
 		display: block;
 	}
+	.galleryjs-thumbnail {
+		height: 64px;
+		width: 64px;
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center center;
+		filter: brightness(75%);
+		transition: 0.5s;
+		float: left;
+		margin-right: 8px;
+		&:hover {
+			cursor: pointer;
+			filter: brightness(100%);
+		}
+	}
 }

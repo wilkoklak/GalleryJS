@@ -23,13 +23,15 @@ function createNode(tag='div', clazz, id) {
 	return node;
 }
 
-var DEFAULTS = {
+var GALLERYJS_DEFAULTS = {
 	preview_height: 500,
 	list_height: 300
 }
 
+var GALLERYJS_FOCUSED;
+
 var GalleryJS = {
-	Gallery: function(container, pictures=[], preview_height=DEFAULTS.preview_height, list_height=DEFAULTS.list_height) {
+	Gallery: function(container, pictures=[], start=0, preview_height=GALLERYJS_DEFAULTS.preview_height, list_height=GALLERYJS_DEFAULTS.list_height) {
 		if(container) {
 			this.container = container;
 			if(this.container.className != '') {
@@ -50,6 +52,12 @@ var GalleryJS = {
 			this.pictures = [];
 			console.error('Pictures list must be an Array!\nCreated an empty array for you.');
 		}
+		if(isItem('Number', start)) {
+			this.currentId = start;
+		} else {
+			console.warn('Start picture id must be a number! Set to 0 for you.');
+			this.currentId = 0;
+		}
 		if(isItem('Number', preview_height)) {
 			this.preview_height = preview_height;
 		} else {
@@ -60,7 +68,7 @@ var GalleryJS = {
 			this.list_height = list_height;
 		} else {
 			console.warn('List height must be a number! Set it to default for you.');
-			this.list_height = DEFAULTS.list_height;
+			this.list_height = GALLERYJS_DEFAULTS.list_height;
 		}
 		this.loadPictures = () => {
 			var list = document.querySelector('.galleryjs-list');
@@ -70,8 +78,27 @@ var GalleryJS = {
 			for(i = 0; i < this.pictures.length; i++) {
 				let pic = createNode('div', 'galleryjs-thumbnail');
 				pic.style.backgroundImage = `url('${this.pictures[i].thumbnail}')`;
+				pic.addEventListener('click', function(id) {
+					this.setPreview(id);
+				}.bind(this, i))
 				list.appendChild(pic);
 			}
+		}
+		this.setPreview = (id) => {
+			let preview = document.querySelector('.galleryjs-preview');
+			while(preview.firstChild) {
+				preview.removeChild(preview.firstChild);
+			}
+			let img = new Image();
+			let l = this.pictures.length - 1;
+			if(id > l) {
+				id = l;
+			} else if (id < 0) {
+				id = 0;
+			}
+			img.src = this.pictures[id].url;
+			preview.appendChild(img);
+			this.currentId = id;
 		}
 		this.addPicture = function(pic) {
 			if(pic.galleryJSStamp) {
@@ -87,7 +114,11 @@ var GalleryJS = {
 		this.preview.style.height = this.preview_height + "px";
 		this.container.appendChild(this.preview);
 		this.container.appendChild(this.list);
+		this.container.addEventListener('click', function(e) {
+			GALLERYJS_FOCUSED = this;
+		}.bind(this))
 		this.loadPictures();
+		this.setPreview(this.currentId);
 	},
 	Picture: function(url, thumbnail, title, description) {
 		if(url && url.trim() != '') {
@@ -119,9 +150,23 @@ var GalleryJS = {
 		this.galleryJSStamp = true;
 	}
 }
+
+window.addEventListener('keypress', (e) => {
+	if(e.keyCode == 39) {
+		if(GALLERYJS_FOCUSED) {
+			GALLERYJS_FOCUSED.setPreview(GALLERYJS_FOCUSED.currentId + 1);
+		}
+	} else if (e.keyCode == 37) {
+		if(GALLERYJS_FOCUSED) {
+			GALLERYJS_FOCUSED.setPreview(GALLERYJS_FOCUSED.currentId - 1);
+		}
+	}
+})
+
 // TESTING
 var x = GalleryJS;
 var pics = [
-	new x.Picture('http://i.imgur.com/Jf77TsR.jpg')
+	new x.Picture('http://i.imgur.com/Jf77TsR.jpg'),
+	new x.Picture('http://i.imgur.com/RYgYZr0.jpg')
 ]
 var gal = new GalleryJS.Gallery(document.querySelector('#container'), pics);
