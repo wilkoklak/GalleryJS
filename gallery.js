@@ -30,6 +30,18 @@ var GalleryJS = {
 			this.pictures = [];
 			console.error('Pictures list must be an Array!\nCreated an empty array for you.');
 		}
+		if(isItem('Number', preview_height)) {
+			this.preview_height = preview_height;
+		} else {
+			console.warn('Preview height must be a number! Set it to default for you.');
+			this.preview_height = 500;
+		}
+		if(isItem('Number', list_height)) {
+			this.list_height = list_height;
+		} else {
+			console.warn('Preview height must be a number! Set it to default for you.');
+			this.list_height = list_height;
+		}
 	},
 	Image: function(url, thumbnail, title, description) {
 		if(url && url.trim() != '') {
@@ -60,6 +72,7 @@ var GalleryJS = {
 		}
 	}
 }
+// TESTING
 var x = GalleryJS;
 var test = new x.Image();
 var gal = new GalleryJS.Gallery(document.querySelector('#container'));
