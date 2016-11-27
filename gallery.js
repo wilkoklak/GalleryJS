@@ -132,9 +132,7 @@ var GalleryJS = {
 			let img_size = img.getBoundingClientRect();
 			let preview_size = preview.getBoundingClientRect();
 			if(img_size.width > preview_size.width) {
-				if(preview.classList.toString().indexOf('flex') == -1) {
-					img.classList = 'alt';
-				}
+				img.classList = 'alt';
 			} else if(img_size.height > preview_size.height) {
 				img.classList = '';
 			}
