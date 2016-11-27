@@ -70,8 +70,9 @@ var GalleryJS = {
 				return false;
 			}
 		}
-		var preview = createNode('div', 'galleryjs-preview');
-		this.container.appendChild(preview);
+		this.preview = createNode('div', 'galleryjs-preview');
+		preview.style.height = this.preview_height + "px";
+		this.container.appendChild(this.preview);
 	},
 	Picture: function(url, thumbnail, title, description) {
 		if(url && url.trim() != '') {
