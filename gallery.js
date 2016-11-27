@@ -8,8 +8,13 @@ function isItem(type, v) {
 	}
 }
 
+var DEFAULTS = {
+	preview_height: 500,
+	list_height: 300
+}
+
 var GalleryJS = {
-	Gallery: function(container, pictures=[], preview_height=500, list_height=300) {
+	Gallery: function(container, pictures=[], preview_height=DEFAULTS.preview_height, list_height=DEFAULTS.list_height) {
 		if(container) {
 			this.container = container;
 			if(this.container.className != '') {
@@ -39,11 +44,19 @@ var GalleryJS = {
 		if(isItem('Number', list_height)) {
 			this.list_height = list_height;
 		} else {
-			console.warn('Preview height must be a number! Set it to default for you.');
-			this.list_height = list_height;
+			console.warn('List height must be a number! Set it to default for you.');
+			this.list_height = DEFAULTS.list_height;
+		}
+		this.addPicture = function(pic) {
+			if(pic.galleryJSStamp) {
+				this.pictures.push(pic)
+			} else {
+				console.error('Image must be of Picture() class!');
+				return false;
+			}
 		}
 	},
-	Image: function(url, thumbnail, title, description) {
+	Picture: function(url, thumbnail, title, description) {
 		if(url && url.trim() != '') {
 			this.url = url;
 		} else {
@@ -70,9 +83,11 @@ var GalleryJS = {
 			console.warn('Description is not specified! Will use "No description" instead.\n' +
 			'Specify empty string if you want empty description field.');
 		}
+		this.galleryJSStamp = true;
 	}
 }
 // TESTING
 var x = GalleryJS;
-var test = new x.Image();
-var gal = new GalleryJS.Gallery(document.querySelector('#container'));
+var test = new x.Picture('aaa');
+var gal = new GalleryJS.Gallery(document.querySelector('#container'), [], 'aaa', 'ooo');
+gal.addPicture('aa');
