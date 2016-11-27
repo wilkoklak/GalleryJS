@@ -70,8 +70,11 @@ var GalleryJS = {
 			console.warn('List height must be a number! Set it to default for you.');
 			this.list_height = GALLERYJS_DEFAULTS.list_height;
 		}
+
 		this.loadPictures = () => {
 			var list = document.querySelector('.galleryjs-list');
+			// Clear list before adding new image to avoid dupes
+			// TODO: find a way to update without removing, too lazy now
 			while(list.firstChild) {
 				list.removeChild(list.firstChild);
 			}
@@ -80,7 +83,7 @@ var GalleryJS = {
 				pic.style.backgroundImage = `url('${this.pictures[i].thumbnail}')`;
 				pic.addEventListener('click', function(id) {
 					this.setPreview(id);
-				}.bind(this, i))
+				}.bind(this, i)) // REMEMBER: this bind stuff is funky
 				list.appendChild(pic);
 			}
 		}
@@ -98,9 +101,20 @@ var GalleryJS = {
 			}
 			img.src = this.pictures[id].url;
 			preview.appendChild(img);
+			let cont = createNode('div', 'galleryjs-desc');
+			let title = createNode('h1');
+			title.innerText = this.pictures[id].title;
+			let desc = createNode('p');
+			desc.innerText = this.pictures[id].description;
+			cont.appendChild(title);
+			cont.appendChild(desc);
+			preview.appendChild(cont);
 			this.currentId = id;
 		}
+
+
 		this.addPicture = function(pic) {
+			// Checks if element is created via new GalleryJS.Image()
 			if(pic.galleryJSStamp) {
 				this.pictures.push(pic);
 				this.loadPictures();
@@ -109,12 +123,20 @@ var GalleryJS = {
 				return false;
 			}
 		}
+
+		// Create elements
 		this.preview = createNode('div', 'galleryjs-preview');
 		this.list = createNode('div', 'galleryjs-list');
 		this.preview.style.height = this.preview_height + "px";
+		this.preview.addEventListener('mouseover', function() {
+			this.preview.querySelector('.galleryjs-desc').classList += ' galleryjs-focused';
+		}.bind(this))
+		this.preview.addEventListener('mouseout', function() {
+			this.preview.querySelector('.galleryjs-desc').classList = 'galleryjs-desc';
+		}.bind(this))
 		this.container.appendChild(this.preview);
 		this.container.appendChild(this.list);
-		this.container.addEventListener('click', function(e) {
+		this.container.addEventListener('click', function() {
 			GALLERYJS_FOCUSED = this;
 		}.bind(this))
 		this.loadPictures();
@@ -152,11 +174,11 @@ var GalleryJS = {
 }
 
 window.addEventListener('keypress', (e) => {
-	if(e.keyCode == 39) {
+	if(e.keyCode == 39) { // Right arrow
 		if(GALLERYJS_FOCUSED) {
 			GALLERYJS_FOCUSED.setPreview(GALLERYJS_FOCUSED.currentId + 1);
 		}
-	} else if (e.keyCode == 37) {
+	} else if (e.keyCode == 37) { // Left arrow
 		if(GALLERYJS_FOCUSED) {
 			GALLERYJS_FOCUSED.setPreview(GALLERYJS_FOCUSED.currentId - 1);
 		}

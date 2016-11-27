@@ -3,6 +3,19 @@
 	.galleryjs-preview {
 		height: 500px;
 		width: inherit;
+		position: relative;
+		.galleryjs-desc {
+			position: absolute;
+			opacity: 0;
+			bottom: 0;
+			width: 100%;
+			background: rgba(0, 0, 0, 0.4);
+			color: #f2f2f2;
+			transition: 0.5s;
+		}
+		.galleryjs-desc.galleryjs-focused {
+			opacity: 1;
+		}
 	}
 	.galleryjs-preview img {
 		height: 100%;
