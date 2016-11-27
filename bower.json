@@ -1,0 +1,22 @@
+{
+  "name": "GalleryJS",
+  "homepage": "https://github.com/wilkoklak/GalleryJS",
+  "authors": [
+    "Artur <thereaperv11@gmail.com>"
+  ],
+  "description": "A JavaScript gallery for your site",
+  "main": "gallery.js",
+  "keywords": [
+    "gallery",
+    "images",
+    "javascript"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
