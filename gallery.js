@@ -7,6 +7,21 @@ function isItem(type, v) {
 		return false;
 	}
 }
+function createNode(tag='div', clazz, id) {
+	if(isItem('String', tag)) {
+		var node = document.createElement(tag);
+	} else {
+		console.warn('Tag argument must be a string!');
+		return false;
+	}
+	if(clazz) {
+		node.classList = clazz;
+	}
+	if(id) {
+		node.id = id;
+	}
+	return node;
+}
 
 var DEFAULTS = {
 	preview_height: 500,
@@ -55,6 +70,8 @@ var GalleryJS = {
 				return false;
 			}
 		}
+		var preview = createNode('div', 'galleryjs-preview');
+		this.container.appendChild(preview);
 	},
 	Picture: function(url, thumbnail, title, description) {
 		if(url && url.trim() != '') {
