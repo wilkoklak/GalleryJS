@@ -1,8 +1,35 @@
 // GalleryJS
 
+function isItem(type, v) {
+	if(v.constructor.toString().indexOf(type) != -1) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 var GalleryJS = {
 	Gallery: function(container, pictures=[], preview_height=500, list_height=300) {
-		console.log(this.test);
+		if(container) {
+			this.container = container;
+			if(this.container.className != '') {
+				this.container.className += ' galleryjs';
+			} else {
+				this.container.className = 'galleryjs';
+			}
+		} else {
+			console.error('You must specify a containing element for gallery!');
+			return false;
+		}
+		if(isItem('Array', pictures)) {
+			this.pictures = pictures;
+			if(this.pictures.length == 0) {
+				console.warn('Pictures list is empty! Consider adding some!');
+			}
+		} else {
+			this.pictures = [];
+			console.error('Pictures list must be an Array!\nCreated an empty array for you.');
+		}
 	},
 	Image: function(url, thumbnail, title, description) {
 		if(url && url.trim() != '') {
@@ -31,8 +58,8 @@ var GalleryJS = {
 			console.warn('Description is not specified! Will use "No description" instead.\n' +
 			'Specify empty string if you want empty description field.');
 		}
-		console.log(this);
 	}
 }
 var x = GalleryJS;
-var test = new x.Image('test', 'test');
+var test = new x.Image();
+var gal = new GalleryJS.Gallery(document.querySelector('#container'));
