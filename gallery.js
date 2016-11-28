@@ -1,89 +1,237 @@
-// Prototyp galerii
-function Gallery(container, pictures = [], preview_height = 500, thumb_size = 64, list_height = 300, background="transparent") {
-	this.container = container; // Tag, w którym umieszczona jest galeria
-	this.container.className += " galleryjs";
-	this.pictures = pictures; // Lista URL do pełnych zdjęć
-	this.preview_height = preview_height;
-	this.list_height = list_height;
-	this.thumb_size = thumb_size;
-	this.background = background;
-	this.preview = document.createElement("div"); // podgląd zdjęcia
-	this.preview.className = "preview";
-	this.preview.style.backgroundColor = this.background;
-	this.preview.style.height = this.preview_height + "px";
-	this.preview.addEventListener("click", function(e) {
-		var mouseX = e.clientX;
-		var preview = this.preview.getBoundingClientRect();
-		var halfWidth = preview.x + preview.width / 2;
-		if(mouseX > halfWidth) {
-			this.changePicture("next");
+// GalleryJS
+
+function isItem(type, v) {
+	if(v.constructor.toString().indexOf(type) != -1) {
+		return true;
+	} else {
+		return false;
+	}
+}
+function createNode(tag = 'div', clazz, id) {
+	if(isItem('String', tag)) {
+		var node = document.createElement(tag);
+	} else {
+		console.warn('Tag argument must be a string!');
+		return false;
+	}
+	if(clazz) {
+		node.classList = clazz;
+	}
+	if(id) {
+		node.id = id;
+	}
+	return node;
+}
+
+var GALLERYJS_DEFAULTS = {
+	preview_height: 500,
+	list_height: 300
+}
+
+var GALLERYJS_FOCUSED;
+
+var GalleryJS = {
+	Gallery: function(container, pictures=[], start=0, preview_height=GALLERYJS_DEFAULTS.preview_height, list_height=GALLERYJS_DEFAULTS.list_height) {
+		if(container) {
+			this.container = container;
+			if(this.container.className != '') {
+				this.container.className += ' galleryjs';
+			} else {
+				this.container.className = 'galleryjs';
+			}
 		} else {
-			this.changePicture("prev");
+			console.error('You must specify a containing element for gallery!');
+			return false;
 		}
-	}.bind(this))
-	this.more = document.createElement("div");
-	this.more.className = "more";
-	this.currentTitle = document.createElement("h1");
-	this.currentDesc = document.createElement("p");
-	this.changePicture = function(id) {
-		if(typeof id == "number") {
-			if(id < 0) {
-				id = this.pictures.length - 1;
-			} else if (id >= this.pictures.length) {
+		if(isItem('Array', pictures)) {
+			this.pictures = pictures;
+			if(this.pictures.length == 0) {
+				console.warn('Pictures list is empty! Consider adding some!');
+			}
+		} else {
+			this.pictures = [];
+			console.error('Pictures list must be an Array!\nCreated an empty array for you.');
+		}
+		if(isItem('Number', start)) {
+			this.currentId = start;
+		} else {
+			console.warn('Start picture id must be a number! Set to 0 for you.');
+			this.currentId = 0;
+		}
+		if(isItem('Number', preview_height)) {
+			this.preview_height = preview_height;
+		} else {
+			console.warn('Preview height must be a number! Set it to default for you.');
+			this.preview_height = 500;
+		}
+		if(isItem('Number', list_height)) {
+			this.list_height = list_height;
+		} else {
+			console.warn('List height must be a number! Set it to default for you.');
+			this.list_height = GALLERYJS_DEFAULTS.list_height;
+		}
+
+		this.loadPictures = () => {
+			var list = document.querySelector('.galleryjs-list');
+			// Clear list before adding new image to avoid dupes
+			// TODO: find a way to update without removing, too lazy now
+			while(list.firstChild) {
+				list.removeChild(list.firstChild);
+			}
+			for(i = 0; i < this.pictures.length; i++) {
+				let pic = createNode('div', 'galleryjs-thumbnail');
+				pic.style.backgroundImage = `url('${this.pictures[i].thumbnail}')`;
+				pic.addEventListener('click', function(id) {
+					this.setPreview(id);
+				}.bind(this, i)) // REMEMBER: this bind stuff is funky
+				list.appendChild(pic);
+			}
+		}
+		this.setAuto = function(interval) {
+			if(interval) {
+				this.interval = setInterval(function() {
+					this.setPreview(this.currentId + 1);
+				}.bind(this), interval * 1000);
+				this.intervalVal = interval * 1000;
+			} else {
+				if(this.interval) {
+					clearInterval(this.interval);
+				}
+			}
+		}
+		this.setPreview = (id) => {
+			let preview = document.querySelector('.galleryjs-preview');
+			let img = new Image();
+			let l = this.pictures.length - 1;
+			if(id > l) {
 				id = 0;
+			} else if (id < 0) {
+				id = l;
+			}
+			if(preview.querySelector('img')) {
+				let img = preview.querySelector('img');
+				img.src = this.pictures[id].url;
+				let title = preview.querySelector('h1');
+				title.innerText = this.pictures[id].title;
+				let desc = preview.querySelector('p');
+				desc.innerText = this.pictures[id].description;
+			} else {
+				let img = new Image();
+				img.src = this.pictures[id].url;
+				preview.appendChild(img);
+				let cont = createNode('div', 'galleryjs-desc');
+				let title = createNode('h1');
+				title.innerText = this.pictures[id].title;
+				let desc = createNode('p');
+				desc.innerText = this.pictures[id].description;
+				cont.appendChild(title);
+				cont.appendChild(desc);
+				preview.appendChild(cont);
+			}
+			img = preview.querySelector('img');
+			let img_size = img.getBoundingClientRect();
+			let preview_size = preview.getBoundingClientRect();
+			if(img_size.width > preview_size.width) {
+				img.classList = 'alt';
+			} else if(img_size.height > preview_size.height) {
+				img.classList = '';
 			}
 			this.currentId = id;
-		} else if(typeof id == "string") {
-			if(id == "next") {
-				this.currentId++;
-			} else if(id == "prev") {
-				this.currentId--;
+			if(this.interval) {
+				clearInterval(this.interval);
+				this.interval = setInterval(function() {
+					this.setPreview(this.currentId + 1);
+				}.bind(this), this.intervalVal);
 			}
-			if(this.currentId < 0) {
-				this.currentId = this.pictures.length - 1;
-			} else if (this.currentId >= this.pictures.length) {
-				this.currentId = 0;
-			}
-			id = this.currentId;
 		}
-		var picture = this.pictures[id];
-		this.preview.style.backgroundImage = "url('" + picture.url + "')";
-		this.currentTitle.innerHTML = picture.pic_title;
-		this.currentDesc.innerHTML = picture.desc;
-	}
-	this.currentId = 0;
-	this.changePicture(0);
-	this.more.appendChild(this.currentTitle);
-	this.more.appendChild(this.currentDesc);
-	this.preview.appendChild(this.more);
-	this.container.appendChild(this.preview);
-	this.list = document.createElement("div"); // kontener dla listy zdjęć
-	this.list.className = "list";
-	this.list.style.height = this.list_height + "px";
-	this.container.appendChild(this.list);
-	this.list_ul = document.createElement("ul"); // lista zdjęć
-	this.list.appendChild(this.list_ul);
-	this.list_thumbs = new Array();
-	// utworzenie li dla każdego zdjęcia z listy
-	for(i = 0; i < this.pictures.length; i++) {
-		this.list_thumbs.push(document.createElement("li"));
-		this.list_thumbs[i].className = "thumb";
-		this.list_thumbs[i].style.backgroundImage = "url('" + this.pictures[i].thumb + "')";
-		this.list_thumbs[i].style.backgroundColor = this.background;
-		this.list_thumbs[i].style.height = this.thumb_size + "px";
-		this.list_thumbs[i].style.width = this.thumb_size + "px";
-		this.list_thumbs[i].addEventListener("click", function(id) {
-			this.changePicture(id);
-		}.bind(this, i))
-		this.list_ul.appendChild(this.list_thumbs[i]);
+
+
+		this.addPicture = function(pic) {
+			// Checks if element is created via new GalleryJS.Image()
+			if(pic.galleryJSStamp) {
+				this.pictures.push(pic);
+				this.loadPictures();
+			} else {
+				console.error('Image must be of Picture() class!');
+				return false;
+			}
+		}
+
+		// Create elements
+		this.preview = createNode('div', 'galleryjs-preview');
+		this.list = createNode('div', 'galleryjs-list');
+		this.list.style.height = this.list_height + 'px';
+		this.preview.style.height = this.preview_height + "px";
+		this.preview.addEventListener('mouseover', function() {
+			this.preview.querySelector('.galleryjs-desc').classList += ' galleryjs-focused';
+		}.bind(this))
+		this.preview.addEventListener('mouseout', function() {
+			this.preview.querySelector('.galleryjs-desc').classList = 'galleryjs-desc';
+		}.bind(this))
+		this.preview.addEventListener('click', function(e) {
+			let prv_size = this.preview.getBoundingClientRect();
+			let prv_left = this.preview.offsetLeft;
+			let prv_half = prv_left + prv_size.width / 2;
+			let pos = e.clientX;
+			if(pos >= prv_left && pos < prv_half) {
+				this.setPreview(this.currentId - 1);
+			} else if (pos <= prv_left + prv_size.width && pos > prv_half) {
+				this.setPreview(this.currentId + 1);
+			}
+		}.bind(this))
+		this.container.appendChild(this.preview);
+		this.container.appendChild(this.list);
+		this.container.addEventListener('click', function() {
+			GALLERYJS_FOCUSED = this;
+		}.bind(this))
+		this.loadPictures();
+		this.setPreview(this.currentId);
+		GALLERYJS_FOCUSED = this;
+	},
+	Picture: function(url, thumbnail, title, description) {
+		if(url && url.trim() != '') {
+			this.url = url;
+		} else {
+			console.error('You must specify URL for a picture!');
+			return false;
+		}
+		if(thumbnail && thumbnail.trim() != '') {
+			this.thumbnail = thumbnail;
+		} else {
+			this.thumbnail = this.url;
+			console.warn('Thumbnail URL is empty!\nSetting thumbnail URL to full picture URL');
+		}
+		if(title || title === '') {
+			this.title = title;
+		} else {
+			this.title = 'No title';
+			console.warn('Title is not specified! Will use "No title" instead.\nSpecify ' +
+			'empty string if you want empty title field.');
+		}
+		if(description || description === '') {
+			this.description = description;
+		} else {
+			this.description = 'No description';
+			console.warn('Description is not specified! Will use "No description" instead.\n' +
+			'Specify empty string if you want empty description field.');
+		}
+		this.galleryJSStamp = true;
 	}
 }
 
-// Prototyp zdjęcia
-function Picture(url, pic_title = "Brak tytułu", desc = "Brak opisu", thumb = false, timestamp = new Date()) {
-	this.url = url;
-	this.pic_title = pic_title;
-	this.desc = desc;
-	this.thumb = thumb || this.url; // Jeśli nie ma ustalonej miniatury, to używa url do pełnego rozmiaru
-	this.timestamp = timestamp;
-}
+window.addEventListener('keypress', function(e) {
+	if(e.keyCode == 39) { // Right arrow
+		if(GALLERYJS_FOCUSED) {
+			GALLERYJS_FOCUSED.setPreview(GALLERYJS_FOCUSED.currentId + 1);
+		}
+	} else if (e.keyCode == 37) { // Left arrow
+		if(GALLERYJS_FOCUSED) {
+			GALLERYJS_FOCUSED.setPreview(GALLERYJS_FOCUSED.currentId - 1);
+		}
+	}
+})
+window.addEventListener('resize', function() {
+	if(GALLERYJS_FOCUSED) {
+		GALLERYJS_FOCUSED.setPreview(GALLERYJS_FOCUSED.currentId);
+	}
+})

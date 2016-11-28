@@ -1,104 +1,78 @@
 # GalleryJS
-Galeria napisana w JS + CSS na Twoją stronę internetową!
+It's a little gallery written in JavaScript and CSS.
+You just have to add 2 files to your project!
 
-## Korzystanie
-GalleryJS to dwa pliki - gallery.js i gallery.css
+## Installation
+Place ``gallery.js`` and ``galleryjs.min.css`` somewhere in your project.
 
-Musisz umieścić odnośnik do nich w kodzie HTML.
-
-Przyjmijmy przykładową strukturę folderów:
-
+## Usage
+Let's say we have a project like this:
 ```
-www/
+proj/
 	css/
-		gallery.css
+		main.css
+		galleryjs.min.css
 	js/
 		gallery.js
 	index.htm
 ```
-Strona na której będzie zamieszczona galeria jest w pliku ``index.htm``.  
-Arkusz stylów do galerii znajduje się w ``css/gallery.css``, natomiast
-kod JS do galeri w ``js/gallery.js``.
-
-Teraz w pliku HTML w sekcji ``<head>`` umieść przykładowy odnośnik do arkusza stylów:
-
-``` html
-<link rel="stylesheet" href="css/gallery.css">
-```
-Następnie w wybranym miejscu na stronie umieść kontener dla galerii:
-
-``` html
-<body>
-	<div class="gallery_container" style="width: 800px; margin: auto">
-	</div>
-</body>
-```
-Kolejnym krokiem jest umieszczenie odnośnika do ``gallery.js``.
-Najlepiej umieścić go pod koniec tagu ``<body>`` lub po nim:
-
-``` html
-<script src="js/gallery.js"></script>
-```
-Kiedy potrzebne pliki zostały zamieszczone, można zainicjować galerię.
-``` javascript
-var pics = [
-	new Picture("https://i.imgur.com/0V4gUeN.jpg", "Tytuł 1", "Opis 1"),
-	new Picture("https://i.imgur.com/5EPnhzA.jpg", "Tytuł 2", "Opis 2")
-]
-var gallery = new Gallery(document.querySelector(".gallery_container"), pics);
-```
-``var pics = [...]`` Tworzy listę "zdjęć" za pomocą prototypu ``Picture()``
-
-``` javascript
-Picture(url, pic_title, desc, thumb, timestamp)
-```
-Gdzie:
-* ``url`` - adres URL obrazka
-* ``pic_title`` - tytuł obrazka
-* ``desc`` - opis obrazka
-* ``thumb`` - adres URL miniatury (jeśli nie jest podany, to jest taki sam jak ``url``)
-* ``timestamp`` - znacznik czasowy oznaczający datę utworzenia zdjęcia. Jeśli nie jest podany, to jest to aktualna data.
-
-Wymagane są tylko pierwsze 3 argumenty.
-
-``Gallery()`` jest prototypem galerii i wygląda następująco:
-``` javascript
-Gallery(container, pictures, preview_height, thumb_size, list_height, background)
-```
-Gdzie:
-* ``container`` - element DOM, w którym ma znajdować się galeria
-* ``pics`` - array z listą obiektów ``Picture()``
-* ``preview_height`` - wysokość pełnego podglądu (domyślnie 500px)
-* ``thumb_size`` - długość boku miniatury (kwadrat, domyślnie 64x64px)
-* ``list_height`` - wysokość listy miniatur (domyślnie 300px). Kiedy miniatury nie będą mieścić się w elemencie ``.list`` to zostanie dodany suwak.
-* ``background`` - kolor tła podglądu i miniatur
-
-Wymagane są tylko pierwsze 2 argumenty.
-
-Należy także wspomnieć, że ``Gallery()`` dziedziczy szerokość kontenera.
-
-Aktualnie całość trzeba skonfigurować na samym początku, ale w przyszłości planuję dodać możliwość zmiany atrybutów już po załadowaniu galerii.
-
-Przykładowy ``index.htm``:
+You have to add ``gallery.js`` and ``galleryjs.min.css`` to your ``<head>`` tag:
 ``` html
 <!doctype html>
-<html lang="pl">
+<html lang='en'>
 <head>
-	<meta charset="utf-8">
-	<title>Demo</title>
-	<link rel="stylesheet" href="css/gallery.css">
+	<meta charset='utf8'>
+	<link rel='stylesheet' href='css/galleryjs.min.css'>
+	<script src='js/gallery.js'></script>
+	<title>My gallery</title>
 </head>
-<body>
-	<div class="gallery_container" style="width: 800px; margin: auto;">
-	</div>
-</body>
-<script src="js/gallery.js"></script>
+```
+Then, inside ``<body>`` you have to add a container for gallery, for ex.:
+``` html
+<div id='container'></div>
+```
+Now, we have to tell GalleryJS where to bind itself.  
+Let's create a ``<script>`` tag at the bottom of ``<body>``:
+```html
+<script>
+var gallery = new GalleryJS.Gallery(document.querySelector('#container'));
+</script>
+```
+We have created a new gallery and bound it with our div. However, we need to add
+some pictures!
+
+Let's create array of pics:
+```html
 <script>
 var pics = [
-    new Picture("https://i.imgur.com/0V4gUeN.jpg", "Tytuł 1", "Opis 1"),
-    new Picture("https://i.imgur.com/5EPnhzA.jpg", "Tytuł 2", "Opis 2")
-]
-var gallery = new Gallery(document.querySelector(".gallery_container"), pics);
+	new GalleryJS.Picture(
+		'http://i.imgur.com/pwbUJwD.jpg',
+		'http://i.imgur.com/pwbUJwDs.jpg',
+		'Picture 1',
+		'Description 1'
+	),
+	new GalleryJS.Picture(
+		'http://i.imgur.com/ApwmJHK.jpg',
+		'http://i.imgur.com/ApwmJHKs.jpg',
+		'Picture 2',
+		'Description 2'
+	),
+	new GalleryJS.Picture(
+		'http://i.imgur.com/dPh0k39.jpg',
+		'http://i.imgur.com/dPh0k39s.jpg',
+		'Picture 3',
+		'Description 3'
+	)
+];
+
+var gallery = new GalleryJS.Gallery(document.querySelector('#container'), pics);
 </script>
-</html>
 ```
+We have created ``pics`` array and passed it as an argument for ``Gallery()``
+constructor.
+
+That's it! Your basic gallery that takes all of screen's width! You can specify
+container's width and GalleryJS will inherit it. However, for now, you have to
+pass an argument with height if you want to change it's height.
+
+~~See API Docs for more!~~ Coming soon...
