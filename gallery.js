@@ -7,7 +7,7 @@ function isItem(type, v) {
 		return false;
 	}
 }
-function createNode(tag='div', clazz, id) {
+function createNode(tag = 'div', clazz, id) {
 	if(isItem('String', tag)) {
 		var node = document.createElement(tag);
 	} else {
