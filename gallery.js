@@ -168,6 +168,17 @@ var GalleryJS = {
 		this.preview.addEventListener('mouseout', function() {
 			this.preview.querySelector('.galleryjs-desc').classList = 'galleryjs-desc';
 		}.bind(this))
+		this.preview.addEventListener('click', function(e) {
+			var prv_size = this.preview.getBoundingClientRect();
+			var prv_left = this.preview.offsetLeft;
+			var prv_half = prv_left + prv_size.width / 2;
+			var pos = e.clientX;
+			if(pos >= prv_left && pos < prv_half) {
+				this.setPreview(this.currentId - 1);
+			} else if (pos <= prv_left + prv_size.width && pos > prv_half) {
+				this.setPreview(this.currentId + 1);
+			}
+		}.bind(this))
 		this.container.appendChild(this.preview);
 		this.container.appendChild(this.list);
 		this.container.addEventListener('click', function() {
