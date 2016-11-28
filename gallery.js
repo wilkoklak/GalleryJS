@@ -169,10 +169,10 @@ var GalleryJS = {
 			this.preview.querySelector('.galleryjs-desc').classList = 'galleryjs-desc';
 		}.bind(this))
 		this.preview.addEventListener('click', function(e) {
-			var prv_size = this.preview.getBoundingClientRect();
-			var prv_left = this.preview.offsetLeft;
-			var prv_half = prv_left + prv_size.width / 2;
-			var pos = e.clientX;
+			let prv_size = this.preview.getBoundingClientRect();
+			let prv_left = this.preview.offsetLeft;
+			let prv_half = prv_left + prv_size.width / 2;
+			let pos = e.clientX;
 			if(pos >= prv_left && pos < prv_half) {
 				this.setPreview(this.currentId - 1);
 			} else if (pos <= prv_left + prv_size.width && pos > prv_half) {
